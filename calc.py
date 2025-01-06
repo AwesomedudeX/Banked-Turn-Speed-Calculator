@@ -26,7 +26,7 @@ if mode == "Single Value":
     st.title("Maximum Speed Calculator")
 
     x = st.number_input("Bank Angle (degrees):")
-    r = st.number_input("Turn Radius (meters):")
+    r = st.number_input("Turn Radius (meters):", value=100)
     f = 1.7
     
     cond = st.radio("Road Conditions (with a regular vehicle, except for F1):", ["Formula 1 (F1 racecar and track)", "Dry Road", "Wet Road", "Snowy Road", "Icy Road"])
