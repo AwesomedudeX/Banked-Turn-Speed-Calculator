@@ -1,3 +1,5 @@
+# Fix NaN value issue
+
 import streamlit as st
 import numpy as np
 from matplotlib import pyplot as plt
@@ -23,15 +25,35 @@ if mode == "Single Value":
 
     st.title("Maximum Speed Calculator")
 
-    x = st.number_input("Bank Angle (degrees):", min_value=-45, max_value=45)
+    x = st.number_input("Bank Angle (degrees):")
     r = st.number_input("Turn Radius (meters):")
-    f = st.number_input("Friction Coefficient:")
+    f = 1.7
+    
+    cond = st.radio("Road Conditions (with a regular vehicle, except for F1):", ["Formula 1 (F1 racecar and track)", "Dry Road", "Wet Road", "Snowy Road", "Icy Road"])
+
+    if cond == "Formula 1 - Dry Road (F1 racecar and track)":
+        f = 1.7
+
+    elif cond == "Dry Road":
+        f = 0.75
+
+    elif cond == "Wet Road":
+        f = 0.45
+
+    elif cond == "Snowy Road":
+        f = 0.25
+
+    elif cond == "Icy Road":
+        f = 0.15
 
     if st.button("Calculate"):
         
         v = calc(x, r, f)
 
-        if unit == "M/S":
+        if v == None:
+            st.write("The result of the given values cannot be obtained. Please enter a valid set of values.")
+
+        elif unit == "M/S":
             st.write(f"**Maximum Speed:** *{round(v, 3)} m/s*")
 
         elif unit == "KM/H":
@@ -42,12 +64,29 @@ if mode == "Single Value":
 
 else:
 
-    st.write(":grey[Results for angles less than -41 degrees become unusable, and angles higher than 45 degrees become unreasonable, so they have been excluded.]")
+    st.title(f"{mode} View")
+
+    cond = sidebar.radio("Road Conditions (with a regular vehicle, except for F1):", ["Formula 1 (F1 racecar and track)", "Dry Road", "Wet Road", "Snowy Road", "Icy Road"])
+
+    if cond == "Formula 1 - Dry Road (F1 racecar and track)":
+        f = 1.7
+
+    elif cond == "Dry Road":
+        f = 0.75
+
+    elif cond == "Wet Road":
+        f = 0.45
+
+    elif cond == "Snowy Road":
+        f = 0.25
+
+    elif cond == "Icy Road":
+        f = 0.15
 
     r = sidebar.number_input("Turn Radius (meters):", value=100)
     f = sidebar.number_input("Friction Coefficient:", value=0.9)
-    minb = sidebar.number_input("Minimum Bank Angle:", value=-41, min_value=-41)
-    maxb = sidebar.number_input("Maximum Bank Angle:", value=45, max_value=45)
+    minb = sidebar.number_input("Minimum Bank Angle:", value=-41)
+    maxb = sidebar.number_input("Maximum Bank Angle:", value=45)
 
     if mode == "Graph":
 
@@ -75,16 +114,16 @@ else:
 
         fig, ax = plt.subplots()
 
-        if c2.checkbox("Show Line Plot"):
+        if c2.checkbox("Show Line Plot", True):
             sn.lineplot(x=x, y=y, color="yellow", size_norm=1)
 
-        if c3.checkbox("Show Scatter Plot"):
+        if c3.checkbox("Show Scatter Plot", True):
             sn.scatterplot(x=x, y=y, size=p, color="blue")
         
         plt.xlabel("Bank Angle (degrees)")
         plt.ylabel("Maximum Speed (m/s)")
 
-        if c4.checkbox("Vertical Line at `x=0`"):
+        if c4.checkbox("Vertical Line at `x=0`", True):
             plt.axvline(0, color="red")
 
         st.pyplot(fig)
