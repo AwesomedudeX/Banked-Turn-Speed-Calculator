@@ -95,8 +95,6 @@ else:
 
     if mode == "Graph":
 
-        st.title("Graph Display")
-
         c1, c2, c3, c4 = st.columns(4)
 
         p = sidebar.number_input("Distance Between `x` Values (smoothness):", step=0.01, value=1.0)
