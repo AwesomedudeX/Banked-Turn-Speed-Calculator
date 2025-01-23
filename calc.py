@@ -25,7 +25,7 @@ if mode == "Single Value":
 
     st.title("Maximum Speed Calculator")
 
-    x = st.number_input("Bank Angle (degrees):")
+    x = st.number_input("Bank Angle (degrees):", min_value=0)
     r = st.number_input("Turn Radius (meters):", value=100)
     f = 1.7
     
@@ -52,7 +52,12 @@ if mode == "Single Value":
         v = str(v)
 
         if v == "nan":
-            st.write("The result of the given values cannot be obtained. Please enter a valid set of values.")
+
+            if str(calc(0, r, f)) != "nan":
+                st.write("This bank angle is too steep to be used for this calculation. Please enter a lower bank angle.")
+
+            else:
+                st.write("The result of the given values cannot be obtained. Please enter a valid set of values.")
 
         else:
 
@@ -66,6 +71,11 @@ if mode == "Single Value":
 
             elif unit == "MPH":
                 st.write(f"**Maximum Speed:** *{round(v * 3.6 / 1.609, 3)} mph*")
+    
+    visual = {
+        "adj": [0, 0],
+        "hyp": [0, 1],
+    }
 
 else:
 
