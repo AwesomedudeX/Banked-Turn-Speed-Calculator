@@ -1,5 +1,3 @@
-# Fix NaN value issue
-
 import streamlit as st
 import numpy as np
 from matplotlib import pyplot as plt
