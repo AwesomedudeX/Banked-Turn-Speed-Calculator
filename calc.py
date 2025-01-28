@@ -76,7 +76,7 @@ if mode == "Calculate Maximum Speed":
 
 elif mode == "Calculate Minimum Bank Angle":
 
-    st.title("Maximum Speed Calculator")
+    st.title("Minimum Bank Angle Calculator")
 
     unit = sidebar.radio("Angle Unit:", ["Degrees", "Radians"])
 
