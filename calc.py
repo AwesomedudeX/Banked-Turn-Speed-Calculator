@@ -11,17 +11,21 @@ def sin(x):
 def cos(x):
     return np.cos(x/180*np.pi)
 
-def calc(x, r, f, g=9.81):
+def calcv(x, r, f, g=9.81):
     return np.sqrt(r * g * (f * cos(x) + sin(x)) / (cos(x) - (f * sin(x))))
+
+def calcx(v, r, f, g=9.81):
+    return np.arctan( ( f - (v**2 / (r*g)) ) / ( -(f * v**2 / (r*g)) - 1 ) )
 
 sidebar = st.sidebar
 
-mode = sidebar.radio("Calculator Mode:", ["Single Value", "Graph", "Table"])
-unit = sidebar.radio("Speed Unit:", ["M/S", "KM/H", "MPH"])
+mode = sidebar.radio("Calculator Mode:", ["Calculate Maximum Speed", "Calculate Minimum Bank Angle", "Graph", "Table"])
 
-if mode == "Single Value":
+if mode == "Calculate Maximum Speed":
 
     st.title("Maximum Speed Calculator")
+    
+    unit = sidebar.radio("Speed Unit:", ["M/S", "KM/H", "MPH"])
 
     x = st.number_input("Bank Angle (degrees):", min_value=0)
     r = st.number_input("Turn Radius (meters):", value=100)
@@ -46,12 +50,12 @@ if mode == "Single Value":
 
     if st.button("Calculate"):
         
-        v = calc(x, r, f)
+        v = calcv(x, r, f)
         v = str(v)
 
         if v == "nan":
 
-            if str(calc(0, r, f)) != "nan":
+            if str(calcv(0, r, f)) != "nan":
                 st.write("This bank angle is too steep to be used for this calculation. Please enter a lower bank angle.")
 
             else:
@@ -69,11 +73,56 @@ if mode == "Single Value":
 
             elif unit == "MPH":
                 st.write(f"**Maximum Speed:** *{round(v * 3.6 / 1.609, 3)} mph*")
-    
-    visual = {
-        "adj": [0, 0],
-        "hyp": [0, 1],
-    }
+
+elif mode == "Calculate Minimum Bank Angle":
+
+    st.title("Maximum Speed Calculator")
+
+    unit = sidebar.radio("Angle Unit:", ["Degrees", "Radians"])
+
+    v = st.number_input("Target Speed:", min_value=0)
+    r = st.number_input("Turn Radius (meters):", value=100)
+    f = 1.7
+
+    cond = st.radio("Road Conditions (with a regular vehicle, except for F1):", ["Formula 1 (F1 racecar and track)", "Dry Road", "Wet Road", "Snowy Road", "Icy Road"])
+
+    if cond == "Formula 1 - Dry Road (F1 racecar and track)":
+        f = 1.7
+
+    elif cond == "Dry Road":
+        f = 0.75
+
+    elif cond == "Wet Road":
+        f = 0.45
+
+    elif cond == "Snowy Road":
+        f = 0.25
+
+    elif cond == "Icy Road":
+        f = 0.15
+
+    if st.button("Calculate"):
+        
+        x = calcx(v, r, f)
+        x = str(x)
+
+        if x == "nan":
+            st.write("The result of the given values cannot be obtained. Please enter a valid set of values.")
+
+        else:
+
+            x = float(x)
+
+            if x < 0:
+                x = 0
+
+            if unit == "Degrees":
+                if x != 0:
+                    x = x / (2*np.pi) * 180
+                st.write(f"**Minimum Bank Angle:** *{round(x, 3)} degrees*")
+
+            else:
+                st.write(f"**Minimum Bank Angle:** *{round(x, 3)} rad.*")
 
 else:
 
@@ -97,6 +146,8 @@ else:
     elif cond == "Icy Road":
         f = 0.15
 
+    unit = sidebar.radio("Speed Unit:", ["M/S", "KM/H", "MPH"])
+
     r = sidebar.number_input("Turn Radius (meters):", value=100)
     minb = sidebar.number_input("Minimum Bank Angle:", value=-41)
     maxb = sidebar.number_input("Maximum Bank Angle:", value=45)
@@ -109,13 +160,13 @@ else:
         x = np.arange(minb, maxb+1, p)
 
         if unit == "M/S":
-            y = [round(calc(a, r, f), 3) for a in x]
+            y = [round(calcv(a, r, f), 3) for a in x]
 
         elif unit == "KM/H":
-            y = [round(calc(a, r, f), 3) * 3.6 for a in x]
+            y = [round(calcv(a, r, f), 3) * 3.6 for a in x]
 
         elif unit == "MPH":
-            y = [round(calc(a, r, f), 3) * 3.6 / 1.609 for a in x]
+            y = [round(calcv(a, r, f), 3) * 3.6 / 1.609 for a in x]
 
         if c1.checkbox("Dark Graph Theme"):
             plt.style.use("dark_background")
@@ -144,13 +195,13 @@ else:
         x = np.arange(minb, maxb+1, 1)
 
         if unit == "M/S":
-            y = [round(calc(a, r, f), 3) for a in x]
+            y = [round(calcv(a, r, f), 3) for a in x]
 
         elif unit == "KM/H":
-            y = [round(calc(a, r, f), 3) * 3.6 for a in x]
+            y = [round(calcv(a, r, f), 3) * 3.6 for a in x]
 
         elif unit == "MPH":
-            y = [round(calc(a, r, f), 3) * 3.6 / 1.609 for a in x]
+            y = [round(calcv(a, r, f), 3) * 3.6 / 1.609 for a in x]
         
         for i in range(len(y)):
             if str(y[i]) == "nan":
